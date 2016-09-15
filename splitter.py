@@ -6,6 +6,7 @@ def get_commands(token_queue):
     command_queue = []
     current_command = []
 
+    # split all commands by pipe
     for token in token_queue:
         if token == commands.command_by_name["|"]:
             command_queue.append(current_command)

@@ -2,6 +2,7 @@ import unittest
 import commands
 
 
+# function searches variables in shell's environment and puts them in the input there it's necessary
 def substitute_variables(input_stream, environment):
     quote_is_not_open = True
 
@@ -23,6 +24,8 @@ def substitute_variables(input_stream, environment):
     return input_stream
 
 
+# function replaces expressions of the form "a=b" by "assign a b"
+# it's required to bring this command to the standard form
 def process_assignment(input_stream):
     tokens = input_stream.split(' ')
 
@@ -36,6 +39,7 @@ def process_assignment(input_stream):
     return input_stream
 
 
+# split input into commands and arguments
 def get_tokens(input_stream, environment):
     input_stream = substitute_variables(input_stream, environment)
     input_stream = process_assignment(input_stream)

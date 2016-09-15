@@ -3,6 +3,7 @@ from commands import command_pipe
 
 
 def execute_commands(command_queue, shell_status):
+    # first item of current_command is a real command and other items are arguments
     for current_command in command_queue:
         # trying to perform command but if we don't know it exception would be raised
         try:
