@@ -1,6 +1,8 @@
 from os import getcwd
 import sys
 import subprocess
+import argparse
+import re
 
 
 cmd_dict = {}
@@ -43,6 +45,48 @@ def wc(args, env, input, output):
 @cmd("exit")
 def exit(args, env, input, output):
     sys.exit(0)
+        
+@cmd("grep")
+def grep(args, enbv, input, output):    
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-A', type=int, action='store')
+    parser.add_argument('-w', action='store_true')
+    parser.add_argument('-i', action='store_true')
+    parser.add_argument('re', action='store')
+    parser.add_argument('file', action='store', nargs="?")
+    args = parser.parse_args(args)
+    
+    reg = args.re
+    if args.w:
+        reg = "{0}{1}{0}".format("\\b", reg)
+        
+    compile_flags = []
+    if args.i:
+        compile_flags.append(re.IGNORECASE)
+        
+    rr = re.compile(reg, *compile_flags)
+        
+    stream = input
+    need_close = False
+    if args.file:
+        stream = open(args.file)
+        need_close = True 
+    
+    visible_line_inc = 1
+    if args.A:
+        visible_line_inc += args.A
+        
+    visible_line_counter = 0
+    for line in stream:
+        if rr.search(line):
+            visible_line_counter += visible_line_inc
+        if visible_line_counter > 0:
+            output.write(line)
+            visible_line_counter -= 1
+            
+    if need_close:
+        stream.close()
+    
     
 def map_cmd(cmd, env, input, output, pseudo):
     try:

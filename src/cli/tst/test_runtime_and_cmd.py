@@ -51,5 +51,15 @@ class Test(unittest.TestCase):
         self.make_output_str(env, envset)
         self.assertEqual(env, env_req)
         
+    def test_grep(self):
+        with tempfile.NamedTemporaryFile() as file:
+            contents = "AAAAA BBBBBB \n CCC dDDD \n"
+            req = "AAAAA BBBBBB "
+            pattern = "BB"
+            file.write(str.encode(contents))
+            file.flush()
+            cmd = Cmd("grep", EnvSet(), [pattern, file.name])
+            self.assertEqual(self.make_output_str(None, cmd), req + "\n")
+        
 if __name__ == "__main__":
     unittest.main()
