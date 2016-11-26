@@ -113,4 +113,4 @@ parser = yacc.yacc()
 lexer = lex.lex()
 
 def parse(s):
-    return parser.parse(s)
+    return parser.parse(s, lexer=lexer)
