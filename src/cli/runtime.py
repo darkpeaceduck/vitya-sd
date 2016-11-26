@@ -1,6 +1,7 @@
 from lang import Cmd, Pipe, EnvAssigment
 import copy
 from cmd import map_cmd
+from io import StringIO
 
 def exec_method(cls):
     def exec_method_gen(func):
@@ -13,8 +14,10 @@ def exec_method(cls):
 
 @exec_method(Pipe)
 def pipe_exec(self, env, input, output):
-    self.cmd.exec(env, input, output)
-    self.nxt.exec(env, input, output)
+    pseudo_io = StringIO()
+    self.cmd.exec(env, input, pseudo_io)
+    pseudo_io.seek(0)
+    self.nxt.exec(env, pseudo_io, output)
 
 @exec_method(Cmd)
 def cmd_exec(self, env, input, output):

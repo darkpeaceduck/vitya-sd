@@ -8,7 +8,7 @@ t_EQUALS       = r'='
 t_PIPE         = r'\|'
 t_NAME         = r'[a-zA-Z_][a-zA-Z0-9_]*'
 t_VALUE_STR    = r'[^\' =\|]+'
-t_QUOTE_STR    = r'\'[^\']*\''
+t_QUOTE_STR    = r'(\'[^\']*\')|(\"[^\"]*\")'
 t_ignore = " \t"
 
 def t_newline(t):
