@@ -1,6 +1,6 @@
 import ply.yacc as yacc
 import ply.lex as lex
-from lang import Pipe, EnvAssigment, Cmd
+from lang import Pipe, EnvAssigment, Cmd, EnvSet
 
 tokens = ('PIPE', 'NAME', 'EQUALS', 'QUOTE_STR', 'VALUE_STR')
 
@@ -22,7 +22,17 @@ def t_error(t):
 precedence = (('left', 'PIPE'),)
 
 
+def p_full(t):
+    '''
+    full : cmd
+    '''
+    t[0] = t[1]
     
+def p_full_env(t):
+    '''
+    full : env
+    '''
+    t[0] = t[1]
     
 def p_pipe(t):
     '''
@@ -35,7 +45,6 @@ def p_cmd(t):
     cmd : env NAME args
     '''
     t[0] = Cmd(t[2], t[1], t[3])
-
     
 def p_args(t):
     '''
@@ -53,14 +62,15 @@ def p_env0(t):
     '''
     env : 
     '''
-    t[0] = []
+    t[0] = EnvSet()
 
 
 def p_env(t):
     '''
     env : env envset
     '''
-    t[0] = t[1] + [t[2]]
+    t[0] = t[1]
+    t[0].add_assign(t[2])
     
 def p_env_set(t):
     '''

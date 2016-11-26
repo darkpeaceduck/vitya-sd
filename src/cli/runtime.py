@@ -1,4 +1,4 @@
-from lang import Cmd, Pipe, EnvAssigment
+from lang import Cmd, Pipe, EnvAssigment, EnvSet
 import copy
 from cmd import map_cmd
 from io import StringIO
@@ -22,10 +22,14 @@ def pipe_exec(self, env, input, output):
 @exec_method(Cmd)
 def cmd_exec(self, env, input, output):
     local_env = copy.copy(env)
-    for assign in self.env_assign:
-        assign.exec(local_env)
+    self.env_assign.exec(local_env, input, output)
     map_cmd(self, local_env, input, output)
 
 @exec_method(EnvAssigment)
-def assigment_exec(self, env):
+def assigment_exec(self, env, input, output):
     env.add_vars({self.name : self.value})
+
+@exec_method(EnvSet)
+def envset_exec(self, env, input, output):
+    for item in self.get_items():
+        item.exec(env, input, output)
