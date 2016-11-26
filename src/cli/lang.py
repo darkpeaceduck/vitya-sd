@@ -10,10 +10,10 @@ class Cmd:
     def __init__(self, name, env_assign, args):
         self.name = name
         self.args = args
-        self.env = env_assign
+        self.env_assign = env_assign
     def __str__(self):
         ss = ""
-        for huy in self.env:
+        for huy in self.env_assign:
             ss += str(huy) 
         return self.name + " args : " + str(self.args) + " env : " + ss
     
