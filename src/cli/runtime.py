@@ -1,6 +1,6 @@
-from lang import Cmd, Pipe, EnvAssigment, EnvSet
+from cli.lang import Cmd, Pipe, EnvAssigment, EnvSet
 import copy
-from cmd import map_cmd
+from cli.cmd import map_cmd
 from io import StringIO
 
 def exec_method(cls):

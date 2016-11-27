@@ -1,7 +1,7 @@
-from preprocessor import substitute
-from parser import parse
-from env import Env
-import runtime
+from cli.preprocessor import substitute
+from cli.parser import parse
+from cli.env import Env
+import cli.runtime
 import sys
 
 
