@@ -1,6 +1,6 @@
 import ply.yacc as yacc
 import ply.lex as lex
-from lang import Pipe, EnvAssigment, Cmd, EnvSet
+from cli.lang import Pipe, EnvAssigment, Cmd, EnvSet
 
 tokens = ('PIPE', 'NAME', 'EQUALS', 'QUOTE_STR', 'VALUE_STR')
 

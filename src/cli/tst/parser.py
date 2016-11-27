@@ -1,6 +1,6 @@
 import unittest
 from cli.lang import *
-from cli.parser import parse
+from cli.parser import *
 
 class Test(unittest.TestCase):
     def make_envset(self, list):
