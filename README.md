@@ -24,3 +24,22 @@ View - отвечает за отрисовку информации.
  - python3 chat/run_trUI_sockets.py (логгирование включено на DEBUG(логируются реализиции connection managerов)) 
  - тесты python3 -m unittest discover -s chat/tst
 
+## gRpc
+
+### Req:
+
+grpcio-tools under python3 (pip3 install...)
+
+### Запуск:
+
+ - добавить src/python в PYTHON_PATH
+ - сгенерировать proto : python3.5 python/chat/run_codegen.py
+ - запустить пир : python3.5  python/chat/run_trUI_grpc.py
+ 
+### Описание Ui
+
+ - выбираем bind server, port, нажимаем listen (для обоих пиров)
+ - выбираем connect server, port, нажимаем connect(для обоих пиров)
+ - ...
+ 
+

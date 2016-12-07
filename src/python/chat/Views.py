@@ -14,9 +14,12 @@ class TkinterUIView(AbstractView):
     DEFAULT_BIND_ADDR = "localhost"
     DEFAULT_BIND_PORT = "9082"
     DEFAULT_USERNAME = "USER"
-    def __init__(self, bus):
+    LAST_TYPING_TIMEOUT=5000
+    def __init__(self, bus, connect_after_listen=False):
         AbstractView.__init__(self)
         self.bus = bus
+        self.connect_after_listen = connect_after_listen
+        self.last_typing = 0
         self.state = {
             "connected" : None,
             "closed" : None,
@@ -37,7 +40,11 @@ class TkinterUIView(AbstractView):
         
     def on_listen_button(self):
         self.bus.listen(self.get_bind_addr())
-        self.connection_info_hide()
+        if not self.connect_after_listen:
+            self.connection_info_hide()
+        else:
+            self.listen_hide()
+            self.connect_show()
         self.close_button.pack()
         
     def on_connect_button(self):
@@ -53,6 +60,12 @@ class TkinterUIView(AbstractView):
     def on_exit(self):
         self.bus.close()
         self.root.destroy()
+        
+    def on_start_typing_msg(self, event):
+        if event.time - self.last_typing > self.LAST_TYPING_TIMEOUT:
+            str_msg = self.get_user_invite(self.name_entry.get()) + "...typing..."
+            self.bus.send(Message(str_data=str_msg))
+        self.last_typing = event.time
         
     def shedule_update_ui(self):
         self.root.after(self.UPDATE_UI_TIMEOUT, self.update_ui)
@@ -96,10 +109,12 @@ class TkinterUIView(AbstractView):
     def create_connect_entry(self):
         self.connect_addr_entry = tk.Entry()
         self.connect_addr_entry.insert(0, self.DEFAULT_BIND_ADDR)
-        self.connect_addr_entry.pack()
         self.connect_port_entry = tk.Entry()
         self.connect_port_entry.insert(0, self.DEFAULT_BIND_PORT)
-        self.connect_port_entry.pack()
+        
+        if not self.connect_after_listen:
+            self.connect_addr_entry.pack()
+            self.connect_port_entry.pack()
         
     def create_control_buttons(self):
         
@@ -108,17 +123,30 @@ class TkinterUIView(AbstractView):
         self.listen_button.pack()
         self.connect_button = tk.Button(master = self.root, text = "connect", \
                                     command = self.on_connect_button)
-        self.connect_button.pack()
+        
+        if not self.connect_after_listen:
+            self.connect_button.pack()
         self.close_button = tk.Button(master = self.root, text = "close", \
                                     command = self.on_close_button)
         
-    def connection_info_hide(self):
+    def listen_hide(self):
         self.listen_button.pack_forget()
-        self.connect_button.pack_forget()
         self.bind_addr_entry.pack_forget()
         self.bind_port_entry.pack_forget()
+        
+    def connect_show(self):
+        self.connect_addr_entry.pack()
+        self.connect_port_entry.pack()
+        self.connect_button.pack()
+        
+    def connect_hide(self):
+        self.connect_button.pack_forget()
         self.connect_addr_entry.pack_forget()
         self.connect_port_entry.pack_forget()
+
+    def connection_info_hide(self):
+        self.listen_hide()
+        self.connect_hide()
         
     def create_name_entry(self):
         self.name_entry = tk.Entry()
@@ -131,6 +159,7 @@ class TkinterUIView(AbstractView):
     def create_msg_entry(self):
         self.msg_entry = tk.Entry()
         self.msg_entry.insert(tk.END, self.get_user_invite(self.DEFAULT_USERNAME))
+        self.msg_entry.bind('<Key>', self.on_start_typing_msg)
         self.msg_entry.pack()
         self.msg_entry_button = tk.Button(master = self.root, text = "send msg", \
                                     command = self.on_msg_entry_button)

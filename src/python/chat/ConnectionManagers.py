@@ -6,6 +6,9 @@ import socket
 from queue import Queue, Empty
 import chat.Message as Message
 from chat.Message import MessageQueueProcessor
+import chat.grpc_serv_pb2 as grpc_serv_pb2
+import concurrent.futures as futures
+import grpc
 
 class AbstractConnectionManager:
     def __init__(self):
@@ -179,6 +182,54 @@ class SocketAsyncCoreConnectionManager(AbstractConnectionManager):
     def close(self):
         threading.Thread(target=self._close).start()
         
+class GrpcServicer(grpc_serv_pb2.ChatServicer):
+    def __init__(self, connection_manager):
+        self.logger = logging.getLogger("grpc servicer")
+        grpc_serv_pb2.ChatServicer.__init__(self)
+        self.connection_manager = connection_manager
+    def Send(self, request, context):
+        msg = Message.Message(str_data=request.message)
+        self.logger.debug("New msg incomes {0}".format(str(msg)))
+        self.connection_manager.on_receive_msg(msg)
+        return request
+        
+class GrpcConnectionManager(AbstractConnectionManager):
+    MAX_WORKERS = 4
+    def __init__(self):
+        self.active_instance = None
+        self.server = None
+        self.channel = None
+        self.stub = None
+        AbstractConnectionManager.__init__(self)
+        self.logger = logging.getLogger("grpc connection manager")
 
+    def send(self, msg):
+        if self.stub:
+            self.stub.Send(grpc_serv_pb2.TransmitMessage(message=str(msg)))
+            self.logger.debug("sent msg {0}".format(str(msg)))
+            self.on_sent(msg)
+            
+    def connect(self, bind_adress, address):
+        addr, port = address
+        self.logger.debug("connecting to {0}:{1}".format(addr, port))
+        self.channel = grpc.insecure_channel("{0}:{1}".format(addr, port))
+        self.stub = grpc_serv_pb2.ChatStub(self.channel)
+        self.on_connected(address)
+        self.logger.debug("connected to {0}:{1}".format(addr, port))
     
+    def listen(self, bind_adress):
+        self.server = grpc.server(futures.ThreadPoolExecutor(max_workers=self.MAX_WORKERS))
+        grpc_serv_pb2.add_ChatServicer_to_server(GrpcServicer(self), self.server)
+        addr, port = bind_adress
+        self.server.add_insecure_port("{0}:{1}".format(addr, port))
+        self.server.start()
+        self.logger.debug("listening {0}:{1}".format(addr, port))
+    
+    def close(self):
+        if self.server:
+            self.server.stop(0)   
+        self.stub = None
+        self.channel = None
+        self.on_closed() 
+        self.logger.debug("incoming channels, stubs went down; server went down")
         
