@@ -20,9 +20,20 @@ View - отвечает за отрисовку информации.
 
 ## gRpc
 
-Req:
+### Req:
 
-grpcio-tools under python3
+grpcio-tools under python3 (pip3 install...)
 
-Запуск:
+### Запуск:
+
+ - добавить src/python в PYTHON_PATH
+ - сгенерировать proto : python3.5 python/chat/run_codegen.py
+ - запустить пира : python3.5  python/chat/chat.run_trUI_grpc.py
+ 
+### Описание Ui
+
+ - выбираем bind server, port, нажимаем listen (для обоих пиров)
+ - выбираем connect server, port, нажимаем connect(для обоих пиров)
+ - ...
+ 
 
