@@ -18,3 +18,11 @@ View - отвечает за отрисовку информации.
 
 Есть реализация ConnectionManager на socket + asyncore, View на Tkinter (запуск - добавить src/python в PYTHONPATH , затем python3 chat/run_trUI_sockets.py (логгирование включено на DEBUG(логируются реализиции connection managerов)); тесты - python3 -m unittest discover -s chat/tst)
 
+## gRpc
+
+Req:
+
+grpcio-tools under python3
+
+Запуск:
+
