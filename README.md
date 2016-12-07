@@ -28,7 +28,7 @@ grpcio-tools under python3 (pip3 install...)
 
  - добавить src/python в PYTHON_PATH
  - сгенерировать proto : python3.5 python/chat/run_codegen.py
- - запустить пира : python3.5  python/chat/chat.run_trUI_grpc.py
+ - запустить пир : python3.5  python/chat/run_trUI_grpc.py
  
 ### Описание Ui
 
