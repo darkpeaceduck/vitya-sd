@@ -52,46 +52,45 @@ def p_args(t):
     '''
     t[0] = [t[1]] + (t[2])
 
-def p_arg(t):
+def p_arga_empty(t):
     '''
     args : 
     '''
     t[0] = []
 
-def p_env0(t):
+def p_env_empty(t):
     '''
     env : 
     '''
     t[0] = EnvSet()
 
 
-def p_env(t):
+def p_env_enset(t):
     '''
     env : env envset
     '''
     t[0] = t[1]
     t[0].add_assign(t[2])
     
-def p_env_set(t):
+def p_envset(t):
     '''
     envset : NAME EQUALS arg_str
     '''
     t[0] = EnvAssigment(t[1], t[3])
     
-def p_quote_str(t):
+def p_arg_str_quote(t):
     '''
     arg_str : QUOTE_STR
     '''
     t[0] = t[1][1:-1]
     
-def p_str(t):
+def p_arg_str_value(t):
     '''
     arg_str : VALUE_STR 
             | NAME 
     '''
     t[0] = t[1]
 
-    
     
 def p_error(t):
     print("Syntax error at '%s'" % t.value)

@@ -45,7 +45,7 @@ def p_cmd(t):
     '''
     t[0] = t[1] + [t[2]]
     
-def p_chunk_empty(t):
+def p_cmd_empty(t):
     '''
     cmd : 
     '''
@@ -57,7 +57,7 @@ def p_chunk_qoute(t):
     '''
     t[0] = QuoteStrReplace(t[1])
     
-def p_fuck1(t):
+def p_chunk_empty(t):
     '''
     chunk : STR
     '''
