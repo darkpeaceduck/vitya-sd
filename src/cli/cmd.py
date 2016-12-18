@@ -2,6 +2,8 @@ from os import getcwd
 import sys
 import subprocess
 
+#Cmds implementations. Use cmd wrapper to implement your's"
+
 
 cmd_dict = {}
 

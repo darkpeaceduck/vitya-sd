@@ -3,6 +3,8 @@ import copy
 from cli.cmd import map_cmd
 from io import StringIO
 
+#inject exec method to language primitives classes
+
 def exec_method(cls):
     def exec_method_gen(func):
         def wrapped(*args):

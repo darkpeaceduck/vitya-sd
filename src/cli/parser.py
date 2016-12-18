@@ -2,6 +2,10 @@ import ply.yacc as yacc
 import ply.lex as lex
 from cli.lang import Pipe, EnvAssigment, Cmd, EnvSet
 
+#parsing string to language primitives using yacc"
+
+
+
 tokens = ('PIPE', 'NAME', 'EQUALS', 'QUOTE_STR')
 
 t_EQUALS       = r'='

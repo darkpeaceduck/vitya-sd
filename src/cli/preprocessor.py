@@ -4,12 +4,16 @@ from string import Template
 from abc import abstractmethod
 import functools
 
+#substite env vars into string"
+
+
 tokens = ('QUOTE_STR', 'STR')
 
 t_QUOTE_STR    = r'\'[^\']*\''
 t_STR          = r'[^\']+'
 t_ignore = " \t"
 
+#replace interface"
 class PrepReplace:
     def __init__(self, s):
         self.str = s
@@ -18,12 +22,14 @@ class PrepReplace:
     def substitute(self, env):
         pass
 
+#Single quote replacement - no action
 class QuoteStrReplace(PrepReplace):
     def __init__(self, s):
         super(QuoteStrReplace, self).__init__(s)
     def substitute(self, env):
         return self.str
     
+#Replacement outside single quote tokens - substitute using Template and env
 class StrReplace(PrepReplace):
     def __init__(self, s):
         super(StrReplace, self).__init__(s)
