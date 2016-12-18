@@ -2,12 +2,11 @@ import ply.yacc as yacc
 import ply.lex as lex
 from cli.lang import Pipe, EnvAssigment, Cmd, EnvSet
 
-tokens = ('PIPE', 'NAME', 'EQUALS', 'QUOTE_STR', 'VALUE_STR')
+tokens = ('PIPE', 'NAME', 'EQUALS', 'QUOTE_STR')
 
 t_EQUALS       = r'='
 t_PIPE         = r'\|'
-t_NAME         = r'[a-zA-Z_][a-zA-Z0-9_]*'
-t_VALUE_STR    = r'[^\' =\|]+'
+t_NAME         = r'[a-zA-Z0-9_\-\.\\\/]+'
 t_QUOTE_STR    = r'(\'[^\']*\')|(\"[^\"]*\")'
 t_ignore = " \t"
 
@@ -80,14 +79,13 @@ def p_envset(t):
     
 def p_arg_str_quote(t):
     '''
-    arg_str : QUOTE_STR
+    arg_str : QUOTE_STR 
     '''
     t[0] = t[1][1:-1]
     
 def p_arg_str_value(t):
     '''
-    arg_str : VALUE_STR 
-            | NAME 
+    arg_str : NAME
     '''
     t[0] = t[1]
 

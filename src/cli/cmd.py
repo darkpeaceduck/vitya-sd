@@ -19,9 +19,12 @@ def pwd(args, env, input, output):
     
 @cmd("cat")
 def cat(args, env, input, output):
-    fname = args[0]
-    with open(fname, 'r') as f:
-        output.write(f.read())
+    if len(args) > 0:
+        fname = args[0]
+        with open(fname, 'r') as f:
+            output.write(f.read())
+    else:
+        output.write(input.read())
         
 @cmd("echo")
 def echo(args, env, input, output):

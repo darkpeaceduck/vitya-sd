@@ -9,8 +9,10 @@ if __name__ == '__main__':
     env = Env()
     while True:
         try:
-            s = input('> ')   
-            ll = parse(substitute(s, env))
+            s = input('> ')  
+            ss = substitute(s, env)
+            ll = parse(ss)
             ll.exec(env, sys.stdin, sys.stdout)
-        except EOFError:
-            break
+        except Exception as e:
+            print ("Failed to complete")
+            print(e)
