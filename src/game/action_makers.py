@@ -8,17 +8,18 @@ def choose_closest(v, v2):
     if min(abs(x-x2), abs(y-y2)) == 0: 
         return (0, 0)
     if abs(x-x2) < abs(y-y2):
-        return ((x-x2)/abs(x-x2), 0)
+        return (int((x-x2)/abs(x-x2)), 0)
     else:
-        return (0, (y-y2)/ abs(y-y2))
+        return (0, int((y-y2)/ abs(y-y2)))
 
 def choose_farest(v, v2):
     x, y = v
     x2, y2 = v2
     if abs(x-x2) < abs(y-y2):
-        vec = (0, (y-y2)/ abs(y-y2))
+        vec = (0, int((y-y2)/ abs(y-y2)))
     else:
-        vec = ((x-x2)/abs(x-x2), 0)
+        vec = (int((x-x2)/abs(x-x2)), 0)
+    return vec
 
 #strategy
 # class MoveGreedyStrat(MoveAction):
@@ -42,12 +43,15 @@ class Maker:
 class MoveToPlayerMaker(Maker):
     def make_action(self, obj, world):
         v = world.player_location()
-        v2 = world.location(self)
+        v2 = world.location(obj)
         if v == v2:
             return Action()
-        vec = choose_farest(v, v2)
-        return MoveAction(obj, world, vec)
-            
+        vec_x, vec_y = choose_farest(v, v2)
+        v_x, v_y = v2
+        to_x, to_y =  v_x + vec_x, v_y + vec_y
+        if world.obstruction_at((to_x, to_y)):
+            vec_x, vec_y = choose_closest(v, v2)
+        return MoveAction(obj, world, (vec_x, vec_y))
                 
 # class ThrowWeaponToPlayerMaker(ThrowAction):
 #     def make_action(self, obj, world):

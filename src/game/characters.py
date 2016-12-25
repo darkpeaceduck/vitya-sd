@@ -18,7 +18,7 @@ class CharacteristicsBuilder(Singleton):
         self.character.damage = 10
         
     def start_strategy(self):
-        self.maker = Maker()
+        self.character.maker = Maker()
         
 #     def start_magic(self):
 #         self.character.magic = 0
@@ -42,7 +42,7 @@ class SoilderBuilder(CharacteristicsBuilder):
     def start_damage(self):
         self.character.damage = 100
     def start_speed(self):
-        self.speed = 2
+        self.character.speed = 2
         
 # class HeavySoilderBuilder(CharacteristicsBuilder):
 #     def start_hp(self):
@@ -64,7 +64,7 @@ class SoilderBuilder(CharacteristicsBuilder):
 #         
 class IIBuiler(CharacteristicsBuilder):
     def start_strategy(self):
-        self.maker = MoveToPlayerMaker()
+        self.character.maker = MoveToPlayerMaker()
         
 class IISolderBuilder(IIBuiler, SoilderBuilder):
     def start_strategy(self):
@@ -90,7 +90,7 @@ class Character(Maker):
         return CharacteristicsBuilder()
     
     def make_action(self, obj, world):
-        self.maker.make_action(obj, world)
+        return self.maker.make_action(obj, world)
     
     
 class IISolder(Character):

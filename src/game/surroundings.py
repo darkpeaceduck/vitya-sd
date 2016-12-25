@@ -8,12 +8,16 @@ class SurroundingsBuilder(Singleton):
         self.entity.destroyable = False
         
     def start_strength(self):
-        self.strength = -1
+        self.entity.strength = -1
+        
+    def start_obstruction(self):
+        self.entity.obstruction = False
         
     def build(self, entity):
         self.start_build(entity)
         self.start_destroyable()
         self.start_strength()
+        self.start_obstruction()
         return self.entity
     
 class WallBuilder(SurroundingsBuilder):
@@ -21,7 +25,10 @@ class WallBuilder(SurroundingsBuilder):
         self.entity.destroyable = True
         
     def start_strength(self):
-        self.strength = 3000
+        self.entity.strength = 3000
+        
+    def start_obstruction(self):
+        self.entity.obstruction = True 
 
 class Surrounding:
     def __init__(self):
