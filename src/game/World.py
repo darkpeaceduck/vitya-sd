@@ -1,6 +1,5 @@
 from game.WorldObjects import deserialiaze, ObjectProfileEnum
 from game.field import Field
-from game.characters import SoilderBuilder
 class World:
     def __init__(self, field):
         self.locations = {}
@@ -12,17 +11,14 @@ class World:
         for x in range(self.rows):
             for y in range(self.cols):
                 cls = deserialiaze(field.get_at(x, y))
-                obj = None
+                obj = cls()
+                self.new_location(obj, (x, y))
                 if cls.PROFILE == ObjectProfileEnum.PLAYER:
-                    obj = cls(SoilderBuilder)
                     self.player = obj
                 if cls.PROFILE == ObjectProfileEnum.CHARACTER:
-                    obj = cls()
                     self.objcts.append(obj)
                 if cls.PROFILE == ObjectProfileEnum.SURROUNDING:
-                    obj = cls()
                     self.surroundings.append(obj)
-                self.new_location(obj, (x, y))
         
     def new_location(self, obj, new_location):
         self.locations[obj]= new_location

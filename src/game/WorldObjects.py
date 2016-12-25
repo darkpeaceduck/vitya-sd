@@ -1,5 +1,5 @@
 from game.surroundings import Grass, Wall, Surrounding
-from game.characters import PlayerCharacter, IISolder
+from game.characters import PlayerCharacter, IISolder, SoilderBuilder
 from enum import Enum
 
 # def huy(cls):
@@ -13,7 +13,10 @@ object_entities = {}
 def world_obj(cls):
     class Wrapper(cls):
         def __init__(self, *args):
-            cls.__init__(self, *args)
+            try:
+                cls.__init__(self, *cls.INIT_PARAMS, *args)
+            except AttributeError:
+                cls.__init__(self, *args)
         def serialiaze(self):
             return cls.TAG
             
@@ -44,6 +47,7 @@ class WallObject(Wall):
 class PlayerCharacterObject(PlayerCharacter):
     TAG = 'P'
     PROFILE = ObjectProfileEnum.PLAYER
+    INIT_PARAMS = [SoilderBuilder]
 
 @world_obj
 class IISolderObject(IISolder):
@@ -56,7 +60,7 @@ def deserialiaze(chr):
 # print(object_entities)
 # print(GrassObject().serialiaze())
 # print(WallObject().serialiaze())
-# print(deserialiaze('P')(game.characters.SoilderBuilder).serialiaze())
+#print(deserialiaze('P')().serialiaze())
 # def     
 # huy(Grass)
 # huy(Wall)
