@@ -13,14 +13,17 @@ def is_destroy(dest):
 
 def simulate_fight(player, enemy):
     for _ in range(0, LONGEST_FIGHT):
-        for j in range(0, player.speed):
-            make_damage(enemy, player)
-            if is_destroy(enemy):
-                return player
         for j in range(0, enemy.speed):
             make_damage(player, enemy)
-            if is_destroy(player):
-                return enemy
+            
+        if is_destroy(player):
+            return enemy
+        
+        for j in range(0, player.speed):
+            make_damage(enemy, player)
+            
+        if is_destroy(enemy):
+            return player
             
 def get_drop(player, item):
     if item.active:

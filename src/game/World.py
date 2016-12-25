@@ -16,6 +16,7 @@ class World:
         self.surroundings = []
         self.player = None
         self.player_active_items = []
+        self.enemy_active_items = []
         self.player_passive_items = []
         self.player_moves_q = []
         self.drop = []
@@ -39,10 +40,14 @@ class World:
         if obj.PROFILE == ObjectProfileEnum.SURROUNDING:
             self.surroundings.append(obj)
         if obj.PROFILE == ObjectProfileEnum.ITEM:
-            if obj.owner == self.player and self.player != None:
-                self.player_active_items.append(obj)
-            else:
+            if obj.owner == None:
                 self.drop.append(obj)
+            else:
+                if obj.owner == self.player:
+                    self.player_active_items.append(obj)
+                else:
+                    self.enemy_active_items.append(obj)
+                    
         if obj.PROFILE == ObjectProfileEnum.END_KEY:
             self.keys.append(obj)
         
@@ -81,7 +86,7 @@ class World:
                 next_actions.append(obj.make_action(obj, self))
                 new_delta = 0
             self.last_move[obj]= new_delta
-        for item in self.player_active_items:
+        for item in (self.player_active_items + self.enemy_active_items):
             next_actions.append(item.make_action(item, self))
         if len(self.player_moves_q) > 0:
             next_actions.append(self.player_moves_q.pop())
@@ -98,6 +103,7 @@ class World:
                 field.set_at(x, y, item.serialiaze())
         dump_list(self.surroundings)
         dump_list(self.objcts)
+        dump_list(self.enemy_active_items)
         dump_list(self.player_active_items)
         dump_list(self.drop)
         dump_list(self.keys)
@@ -137,6 +143,8 @@ class World:
             self.drop.remove(obj)
         if obj in self.keys:
             self.keys.remove(obj)
+        if obj in self.enemy_active_items:
+            self.enemy_active_items.remove(obj)
         del self.locations[obj]
         
     def player_throwed_knife(self, vec):
@@ -151,7 +159,7 @@ class World:
             action.impact(self)
         destroyed = []
         active_items = self.player_active_items
-        for obj in self.objcts:
+        for obj in (self.objcts + self.enemy_active_items):
             if self.location(obj) == self.player_location():
                 winner = simulate_fight(self.player, obj)
                 if winner != self.player:
@@ -185,9 +193,3 @@ class World:
             
         if len(self.keys) == 0:
             self.set_game_over(GameOver.WIN)
-        
-                
-#     def new_weapon(self, weapon, center, vec):
-#         pass
-    
-    

@@ -1,5 +1,5 @@
 from game.surroundings import Grass, Wall, Surrounding
-from game.characters import PlayerCharacter, IISolder, SoilderBuilder
+from game.characters import PlayerCharacter, IISolder, SoilderBuilder, IIArcher
 from game.items import *
 from enum import Enum
 
@@ -48,10 +48,17 @@ class IISolderObject(IISolder):
     TAG = 'E'
     PROFILE = ObjectProfileEnum.CHARACTER
 
+
 @world_obj    
 class KnifeActiveObject(KnifeActive):
     TAG = '@'
     PROFILE = ObjectProfileEnum.ITEM
+    
+@world_obj
+class IIArcherObject(IIArcher):
+    TAG = 'J'
+    PROFILE = ObjectProfileEnum.CHARACTER
+    INIT_PARAMS = [KnifeActiveObject]
     
 @world_obj
 class KnifeDrop(KnifeDrop):

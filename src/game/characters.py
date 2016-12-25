@@ -1,7 +1,8 @@
 from game.util import Singleton
-from game.action_makers import MoveToPlayerMaker, Maker
-#builder + singleton
-class CharacteristicsBuilder(Singleton):
+from game.action_makers import MoveToPlayerMaker, Maker,\
+    ThrowWeaponToPlayerMaker, StratComposite, MoveGreedyStrat
+#builder
+class CharacteristicsBuilder:
     def start_build(self, character):
         self.character = character
         
@@ -48,36 +49,32 @@ class SoilderBuilder(CharacteristicsBuilder):
     def start_move_speed(self):
         self.character.move_speed = 2
         
-# class HeavySoilderBuilder(CharacteristicsBuilder):
-#     def start_hp(self):
-#         self.character.hp = 300
-#     def start_armor(self):
-#         self.character.armor = 100
-#     def start_damage(self):
-#         self.character.damage = 200
-#         
-# class ArcherBuilder(CharacteristicsBuilder):
-#     def start_range_weapon(self):
-#         self.range_weapon = None
-#     def incremental_build(self, character):
-#         self.start_range_weapon()
-#         return self.character
-#     def build(self, character):
-#         CharacteristicsBuilder.build(self, character)
-#         return self.character
-#         
+class LightSoilderBuilder(CharacteristicsBuilder):
+    def start_hp(self):
+        self.character.hp = 200
+    def start_armor(self):
+        self.character.armor = 0
+    def start_damage(self):
+        self.character.damage = 50
+    def move_speed(self):
+        self.character.move_speed = 3
+
 class IIBuiler(CharacteristicsBuilder):
     def start_strategy(self):
         self.character.maker = MoveToPlayerMaker()
-        
-class IISolderBuilder(IIBuiler, SoilderBuilder):
+     
+#+singleton   
+class IISolderBuilder(Singleton, IIBuiler, SoilderBuilder):
     def start_strategy(self):
         IIBuiler.start_strategy(self)
-# class IIArcherBuilder(IIBuiler, ArcherBuilder, SoilderBuilder):
-#     def start_strat(self):
-#         self.strat = StratComposite()
-#         self.strat.add_strat(MoveToPlayerMaker(), 0)
-#         self.strat.add_strat(ThrowWeaponToPlayerMaker(), 2)
+
+class IIArcherBuilder(LightSoilderBuilder):
+    def __init__(self, wp):
+        self.wp = wp
+    def start_strategy(self):
+        self.character.maker = StratComposite()
+        self.character.maker.add_strat(MoveGreedyStrat(), 1)
+        self.character.maker.add_strat(ThrowWeaponToPlayerMaker(self.wp), 0)
     
         
 # class MageBuilder(CharacteristicsBuilder):
@@ -104,12 +101,13 @@ class IISolder(Character):
     def builder(self):
         return IISolderBuilder()
     
-# class IIArcher(Character):
-#     def __init__(self):
-#         Character.__init__(self)
-#         
-#     def builder(self):
-#         return IIArcherBuilder()
+class IIArcher(Character):
+    def __init__(self, wp):
+        self.wp = wp
+        Character.__init__(self)
+         
+    def builder(self):
+        return IIArcherBuilder(self.wp)
     
 class PlayerCharacter(Character):
     def __init__(self, cls):

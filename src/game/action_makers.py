@@ -22,22 +22,25 @@ def choose_farest(v, v2):
     return vec
 
 #strategy
-# class MoveGreedyStrat(MoveAction):
-#     _move_order = [LEFT, UP, RIGHT, DOWN]
-#     def __init__(self):
-#         self._index = 0
-#     def action(self, world):
-#         for _ in range(len(self._move_order)):
-#             vec = self._move_order[self._index]
-#             if self.move(world, vec):
-#                 return True
-#             else:
-#                 self._index = (self._index + 1) % len(self._move_order)
-#         return False
     
     
 class Maker:
     def make_action(self, obj, world):
+        return Action()
+    
+class MoveGreedyStrat(Maker):
+    _move_order = [LEFT, UP, RIGHT, DOWN]
+    _index = 0
+    def make_action(self, obj, world):
+        x, y = world.location(obj)
+        for _ in range(len(self._move_order)):
+            vec_x, vec_y = self._move_order[self._index]
+            to_x, to_y = x + vec_x, y + vec_y
+            if not world.obstruction_at((to_x, to_y)) and \
+            not world.out_of_bounds((to_x,to_y)):
+                return MoveAction(obj, world, (vec_x, vec_y))
+            else:
+                self._index = (self._index + 1) % len(self._move_order)
         return Action()
       
 class MoveToPlayerMaker(Maker):
@@ -63,14 +66,17 @@ class MoveToVectorMake(Maker):
         if world.out_of_bounds((to_x, to_y)) or world.obstruction_at((to_x, to_y)):
             return DestroyAction(obj)
         return MoveAction(obj, world, self.vec)
-# class ThrowWeaponToPlayerMaker(ThrowAction):
-#     def make_action(self, obj, world):
-#         v = world.player_location()
-#         v2 = world.location(self)
-#         if v == v2:
-#             return False
-#         vec = choose_farest(v, v2)
-#         return ThrowAction(obj, world, vec)
+
+class ThrowWeaponToPlayerMaker(ThrowAction):
+    def __init__(self, wp_cls):
+        self.wp_cls = wp_cls
+    def make_action(self, obj, world):
+        v = world.player_location()
+        v2 = world.location(obj)
+        if v == v2:
+            return Action()
+        vec = choose_farest(v, v2)
+        return ThrowAction(obj, self.wp_cls(vec), world)
 #     
 # class PlayerMaker(ThrowAction, MoveAction):
 #     def make_action(self, _, world):
@@ -106,7 +112,7 @@ class StratComposite(Action):
     def __init__(self):
         self.sts = []
     def add_strat(self, strat, priority):
-        self.sts.append((strat, 0, priority))
+        self.sts.append([strat, 0, priority])
     def next_iter(self):
         for item in self.sts:
             item[1] -= 1
@@ -120,7 +126,10 @@ class StratComposite(Action):
                 strat = item[0]
                 max_priority = item[2]
         return strat
-    def action(self, world):
+    def make_action(self, obj, world):
         self.next_iter()
-        self.choose_strat().action(world)
+        strat = self.choose_strat()
+        print(strat) 
+        print(type(strat).__name__)
+        return strat.make_action(obj, world)
         
