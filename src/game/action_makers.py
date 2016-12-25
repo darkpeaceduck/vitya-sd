@@ -34,7 +34,12 @@ def choose_farest(v, v2):
 #                 self._index = (self._index + 1) % len(self._move_order)
 #         return False
     
-class MoveToPlayerMaker:
+    
+class Maker:
+    def make_action(self, obj, world):
+        return Action()
+      
+class MoveToPlayerMaker(Maker):
     def make_action(self, obj, world):
         v = world.player_location()
         v2 = world.location(self)
@@ -44,19 +49,19 @@ class MoveToPlayerMaker:
         return MoveAction(obj, world, vec)
             
                 
-class ThrowWeaponToPlayerMaker(ThrowAction):
-    def make_action(self, obj, world):
-        v = world.player_location()
-        v2 = world.location(self)
-        if v == v2:
-            return False
-        vec = choose_farest(v, v2)
-        return ThrowAction(obj, world, vec)
-    
-class PlayerMaker(ThrowAction, MoveAction):
-    def make_action(self, _, world):
-        if world.player_
-        return world.next_player_action()
+# class ThrowWeaponToPlayerMaker(ThrowAction):
+#     def make_action(self, obj, world):
+#         v = world.player_location()
+#         v2 = world.location(self)
+#         if v == v2:
+#             return False
+#         vec = choose_farest(v, v2)
+#         return ThrowAction(obj, world, vec)
+#     
+# class PlayerMaker(ThrowAction, MoveAction):
+#     def make_action(self, _, world):
+#         if world.player_
+#         return world.next_player_action()
             
     
 # class BlockedMagicDirectedToPlayerStrat(Action):

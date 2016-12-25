@@ -2,15 +2,19 @@ from game.field import Field
 from time import sleep
 import threading
 import curses
+import copy
 
 class ScreenRenderer:
     def set_scr(self, stdscr):
         self._stdscr = stdscr
+        
+    def get_scr(self):
+        return self._stdscr
 
 class FieldRenderer(ScreenRenderer):
     def render_field(self, field):
         rows, cols = field.get_demensions()
-        scr = self._stdscr
+        scr = self.get_scr()
         scr.clear()
         for i in range(rows):
             for j in range(cols):
@@ -19,12 +23,14 @@ class FieldRenderer(ScreenRenderer):
         
 class StatusRenderer(ScreenRenderer):
     def render_stat(self, status_dict):
-        self._stdscr.clear()
+        self.get_scr().clear()
         for k, v in status_dict.items():
-            self._stdscr.addstr(k + " : " + v + "\n")
-        self._stdscr.refresh()
+            self.get_scr().addstr(k + " : " + v + "\n")
+        self.get_scr().refresh()
                 
 class FrameQRenderer:
+    def __init__(self):
+        self.render_q = []
     def set_renderers(self, field_renderer, status_renderer):
         self.field_renderer = field_renderer
         self.status_renderer = status_renderer
@@ -36,18 +42,43 @@ class FrameQRenderer:
         self.field_renderer.render_field(frame.field)   
         self.status_renderer.render_stat(frame.stat)
         
-                
-class Gfx(FrameQRenderer, ScreenRenderer):
-    RENDER_TICK = 0.01
+class IOControllerRenderer(ScreenRenderer):
     def __init__(self):
-        #default atomic pusher/getter
-        self.render_q = []
-        #atomic flag
         self.finilizated = False
-        
+        self.key_ev_list = {}
     def update_input_derwin(self):
         self._stdscr.clear()
         self._stdscr.refresh()
+    
+    def invoke_event(self, event):
+        event()
+        
+    def on_finit(self, event):
+        self.on_finit = event
+        
+    def io_loop(self):
+        while not self.is_finilizated():
+            event = self._stdscr.getch()
+            if event in self.key_ev_list:
+                self.invoke_event(self.key_ev_list[event])
+        self.finit()
+        
+    def is_finilizated(self):
+        return self.finilizated
+    
+    def finit(self):
+        self.finilizated = True
+        self.invoke_event(self.on_finit)
+        
+    def register_key_event(self, key, event):
+        self.key_ev_list[ord(key)] = event
+        
+                
+class Gfx(FrameQRenderer, IOControllerRenderer):
+    RENDER_TICK = 0.01
+    def __init__(self):
+        FrameQRenderer.__init__(self)
+        IOControllerRenderer.__init__(self)
     
     def render_loop(self):
         while not self.finilizated:
@@ -58,12 +89,8 @@ class Gfx(FrameQRenderer, ScreenRenderer):
             self.update_input_derwin()
             sleep(self.RENDER_TICK)
             
-    def io_loop(self):
-        while 1:
-            event = self._stdscr.getch()
-            if (event == ord('Q')):
-                break
-        self.finilizated = True
+        curses.endwin()
+            
         
     def start_loops(self):
         self.render_t = threading.Thread(target=self.render_loop)
@@ -75,10 +102,28 @@ class Gfx(FrameQRenderer, ScreenRenderer):
         self.render_t.join()
         self.io_t.join()
         
+class GfxDefault(Gfx):
+    FIELD_PROPORTION = 5
+    STATUS_PROPORTION = 3
+    IO_PROPORTION = 1
+    def __init__(self):
+        Gfx.__init__(self)
+        sc = curses.initscr()
+        fieldr = FieldRenderer()
+        statusr = StatusRenderer()
+        
+        h, _ = sc.getmaxyx()
+        fieldr.set_scr(sc.derwin(0, 0))
+        parts = (self.FIELD_PROPORTION + self.STATUS_PROPORTION + self.IO_PROPORTION) 
+        print(int(1.0 /self.FIELD_PROPORTION * parts))
+        statusr.set_scr(sc.derwin(int(1.0 * self.FIELD_PROPORTION / parts * h) , 0))
+        self.set_scr(sc.derwin(int(1.0 * (self.FIELD_PROPORTION + self.STATUS_PROPORTION) / parts * h), 0))
+        self.set_renderers(fieldr, statusr)
+        
 class Frame:
     def __init__(self, field, stat):
-        self.field = field
-        self.stat = stat
+        self.field = copy.copy(field)
+        self.stat = copy.copy(stat)
         
     
 # def update(fi, field):
@@ -103,33 +148,26 @@ class Frame:
 # import curses
 # import threading
 
-a = Field(2, 2)
-a.set_at(0, 0, 'H')
-a.set_at(1, 1, 'P')
-stat = {}
-fieldr = FieldRenderer()
-gfx = Gfx()
-statusr = StatusRenderer()
-
-sc = curses.initscr()
-fieldr.set_scr(sc.derwin(0, 0))
-statusr.set_scr(sc.derwin(5, 0))
-gfx.set_scr(sc.derwin(11, 0))
-
-gfx.set_renderers(fieldr, statusr)
-frame = Frame(a, stat)
-gfx.push_frame(frame)
-
-gfx.start_loops()
-
-for i in range(ord('A'), ord('Z')):
-    a.set_at(0, 1, chr(i))
-    stat["pizda"] = "huy" + chr(i)
-    gfx.push_frame(frame)
-    sleep(1)
-gfx.join_loops()
-
-curses.endwin()
+# a = Field(2, 2)
+# a.set_at(0, 0, 'H')
+# a.set_at(1, 1, 'P')
+# stat = {}
+# 
+# gfx = GfxDefault()
+# gfx.push_frame(Frame(a, stat))
+# gfx.register_key_event('Q', gfx.finit)
+# 
+# gfx.start_loops()
+# 
+# for i in range(ord('A'), ord('Z')):
+#     a.set_at(0, 1, chr(i))
+#     stat["pizda"] = "huy" + chr(i)
+#     gfx.push_frame(Frame(a, stat))
+#     if gfx.is_finilizated():
+#         break
+#     sleep(1)
+# 
+# gfx.join_loops()
 
 
 # 
