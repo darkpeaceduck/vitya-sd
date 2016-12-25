@@ -53,7 +53,7 @@ class IOControllerRenderer(ScreenRenderer):
     def invoke_event(self, event):
         event()
         
-    def on_finit(self, event):
+    def set_on_finit(self, event):
         self.on_finit = event
         
     def io_loop(self):

@@ -9,6 +9,9 @@ class Manager:
     def register_keys(self):
         self.gfx.register_key_event('Q', self.gfx.finit)
         
+    def register_events(self):
+        self.gfx.set_on_finit(self.on_finit)
+        
     def next_world(self):
         pass
 #         next_world = copy.copy(self.world)
@@ -19,30 +22,22 @@ class Manager:
 #         self.world = next_world
                 
     def logic_thread(self):
-        self.world = World()
+        self.world = World(self.start_field)
         while not self.finit:
             self.next_world()
             self.gfx.push_frame(Frame(self.world.frame(), {}))
             sleep(self.LOGIC_TICK)
                 
             
-    def __init__(self, gfx):
+    def __init__(self, field, gfx):
         self.finit = False
         self.gfx = gfx
-        frame = Frame(a, stat)
-        gfx.push_frame(frame)
-
-        gfx.start_loops()
-
-        for i in range(ord('A'), ord('Z')):
-            a.set_at(0, 1, chr(i))
-            stat["pizda"] = "huy" + chr(i)
-            gfx.push_frame(frame)
-            if gfx.is_finilizated():
-                break
-            sleep(1)
+        self.start_field = field
+        self.register_keys()
+        self.register_events()
         
-        gfx.join_loops()
+    def on_finit(self):
+        self.finit = True
         
     def start(self):
         self.logic_t = threading.Thread(target=self.logic_thread)
