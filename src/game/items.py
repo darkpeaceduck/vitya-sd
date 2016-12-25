@@ -15,6 +15,12 @@ class KnifeDrop(Item):
     hp = 100
     active = 1
     
+class Sword(Item):
+    damage = 300
+    
+class Shield(Item):
+    armor = 300
+    
 class KnifeActive(KnifeDrop, MoveToVectorMake):
     def __init__(self, vec):
         MoveToVectorMake.__init__(self, vec)

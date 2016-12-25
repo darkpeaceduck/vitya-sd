@@ -44,7 +44,7 @@ class PlayerCharacterObject(PlayerCharacter):
 
 @world_obj
 class IISolderObject(IISolder):
-    TAG = 'S'
+    TAG = 'E'
     PROFILE = ObjectProfileEnum.CHARACTER
 
 @world_obj    
@@ -55,6 +55,16 @@ class KnifeActiveObject(KnifeActive):
 @world_obj
 class KnifeDrop(KnifeDrop):
     TAG = 'K'
+    PROFILE = ObjectProfileEnum.ITEM
+    
+@world_obj
+class ShieldDrop(Shield):
+    TAG = 'A'
+    PROFILE = ObjectProfileEnum.ITEM
+    
+@world_obj
+class SwordDrop(Sword):
+    TAG = 'S'
     PROFILE = ObjectProfileEnum.ITEM
     
 def deserialiaze(chr):
