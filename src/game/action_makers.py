@@ -22,8 +22,6 @@ def choose_farest(v, v2):
     return vec
 
 #strategy
-    
-    
 class Maker:
     def make_action(self, obj, world):
         return Action()
@@ -77,35 +75,7 @@ class ThrowWeaponToPlayerMaker(ThrowAction):
             return Action()
         vec = choose_farest(v, v2)
         return ThrowAction(obj, self.wp_cls(vec), world)
-#     
-# class PlayerMaker(ThrowAction, MoveAction):
-#     def make_action(self, _, world):
-#         if world.player_
-#         return world.next_player_action()
-            
-    
-# class BlockedMagicDirectedToPlayerStrat(Action):
-#     def action(self, world):
-#         v = world.player_location()
-#         v2 = world.location(self)
-#         if v == v2:
-#             return False
-#         vec = choose_closest(v, v2)
-#         if vec == (0, 0):
-#             return False
-#         return self.magic_directed(world, self.magic, vec)
-#     
-# class FightMagicDirectedToPlayerStrat(Action):
-#     def action(self, world):
-#         v = world.player_location()
-#         v2 = world.location(self)
-#         if v == v2:
-#             return False
-#         vec = choose_farest(v, v2)
-#         return self.magic_directed(world, self.magic, vec)
-#     
-# class MagicRangedToPlayerStrat(Action):
-#     pass
+
 
 #composite
 class StratComposite(Action):
@@ -132,4 +102,3 @@ class StratComposite(Action):
         print(strat) 
         print(type(strat).__name__)
         return strat.make_action(obj, world)
-        

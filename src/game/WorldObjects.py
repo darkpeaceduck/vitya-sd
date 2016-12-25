@@ -3,7 +3,7 @@ from game.characters import PlayerCharacter, IISolder, SoilderBuilder, IIArcher
 from game.items import *
 from enum import Enum
 
-        
+#decorator        
 object_entities = {}
 def world_obj(cls):
     class Wrapper(cls):
@@ -82,11 +82,3 @@ class ExitKey(object):
     
 def deserialiaze(chr):
     return object_entities[chr]
-
-# print(object_entities)
-# print(GrassObject().serialiaze())
-# print(WallObject().serialiaze())
-# print(deserialiaze('K')().serialiaze())
-# def     
-# huy(Grass)
-# huy(Wall)

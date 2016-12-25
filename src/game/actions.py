@@ -32,10 +32,3 @@ class ThrowAction(Action):
         
     def impact(self, world):
         return world.throw_weapon(self.w_obj, self.location)
-    
-# def MagicAction(Action):
-#     def magic_directed(self, world, move_vector):
-#         return world.new_directed_magic(magic, world.location(self), move_vector)
-#     
-#     def magic_range(self, world, magic):
-#         return world.new_range_magic(magic, world.location(self))

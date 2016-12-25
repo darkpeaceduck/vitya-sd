@@ -55,10 +55,6 @@ class Manager:
         self.world = World(self.start_field)
         while not self.finit:
             self.next_world()
-#             field = self.world.field()
-#             for row in range(field._rows):
-#                 print(field._field[row])
-#             print(self.world.field()._field[0])
             self.gfx.push_frame(Frame(self.world.field(), self.world.player_status()))
             if self.world.is_game_over():
                 self.game_over()

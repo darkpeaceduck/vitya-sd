@@ -1,6 +1,7 @@
 from game.util import Singleton
 from game.action_makers import MoveToPlayerMaker, Maker,\
     ThrowWeaponToPlayerMaker, StratComposite, MoveGreedyStrat
+
 #builder
 class CharacteristicsBuilder:
     def start_build(self, character):
@@ -23,9 +24,6 @@ class CharacteristicsBuilder:
         
     def start_strategy(self):
         self.character.maker = Maker()
-        
-#     def start_magic(self):
-#         self.character.magic = 0
     
     def build(self, entity):
         self.start_build(entity)
@@ -35,11 +33,8 @@ class CharacteristicsBuilder:
         self.start_damage()
         self.start_strategy()
         self.start_move_speed()
-#         self.start_magic()
         return self.character
     
-#     def incremental_build(self, entity):
-#         return self.build()
     
 class SoilderBuilder(CharacteristicsBuilder):
     def start_armor(self):
@@ -77,12 +72,6 @@ class IIArcherBuilder(LightSoilderBuilder):
         self.character.maker.add_strat(ThrowWeaponToPlayerMaker(self.wp), 0)
     
         
-# class MageBuilder(CharacteristicsBuilder):
-#     def start_armor(self):
-#         self.character.armor = 10
-#     def start_magic(self):
-#         self.character.magic = 10
-#     
 class Character(Maker):
     def __init__(self):
         self.builder().build(self)
