@@ -52,7 +52,17 @@ class MoveToPlayerMaker(Maker):
         if world.obstruction_at((to_x, to_y)):
             vec_x, vec_y = choose_closest(v, v2)
         return MoveAction(obj, world, (vec_x, vec_y))
-                
+    
+class MoveToVectorMake(Maker):
+    def __init__(self, vec):
+        self.vec = vec
+    def make_action(self, obj, world):
+        v_x, v_y = world.location(obj)
+        x, y = self.vec
+        to_x, to_y = v_x + x, v_y + y
+        if world.out_of_bounds((to_x, to_y)) or world.obstruction_at((to_x, to_y)):
+            return DestroyAction(obj)
+        return MoveAction(obj, world, self.vec)
 # class ThrowWeaponToPlayerMaker(ThrowAction):
 #     def make_action(self, obj, world):
 #         v = world.player_location()

@@ -13,6 +13,10 @@ class Manager:
         self.gfx.register_key_event('a', self.player_moved_left)
         self.gfx.register_key_event('w', self.player_moved_up)
         self.gfx.register_key_event('s', self.player_moved_down)
+        self.gfx.register_key_event('8', self.knife_throwed_up)
+        self.gfx.register_key_event('2', self.knife_throwed_down)
+        self.gfx.register_key_event('4', self.knife_throwed_left)
+        self.gfx.register_key_event('6', self.knife_throwed_right)
         
     def player_moved_right(self):
         self.world.player_moved(DOWN)
@@ -25,6 +29,18 @@ class Manager:
         
     def player_moved_down(self):
         self.world.player_moved(RIGHT)
+        
+    def knife_throwed_up(self):
+        self.world.player_throwed_knife(LEFT)
+        
+    def knife_throwed_down(self):
+        self.world.player_throwed_knife(RIGHT)
+    
+    def knife_throwed_left(self):
+        self.world.player_throwed_knife(UP)
+        
+    def knife_throwed_right(self):
+        self.world.player_throwed_knife(DOWN)
         
     def register_events(self):
         self.gfx.set_on_finit(self.on_finit)

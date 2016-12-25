@@ -1,5 +1,6 @@
 from game.surroundings import Grass, Wall, Surrounding
 from game.characters import PlayerCharacter, IISolder, SoilderBuilder
+from game.items import *
 from enum import Enum
 
 # def huy(cls):
@@ -31,10 +32,11 @@ class ObjectProfileEnum(Enum):
     SURROUNDING = 1
     PLAYER = 2
     CHARACTER = 3
+    ITEM = 4
     
 @world_obj
 class GrassObject(Grass):
-    TAG = '*'
+    TAG = '.'
     PROFILE = ObjectProfileEnum.SURROUNDING
     
 
@@ -53,6 +55,11 @@ class PlayerCharacterObject(PlayerCharacter):
 class IISolderObject(IISolder):
     TAG = 'S'
     PROFILE = ObjectProfileEnum.CHARACTER
+
+@world_obj    
+class KnifeObject(KnifeActive):
+    TAG = '@'
+    PROFILE = ObjectProfileEnum.ITEM
     
 def deserialiaze(chr):
     return object_entities[chr]
@@ -60,7 +67,7 @@ def deserialiaze(chr):
 # print(object_entities)
 # print(GrassObject().serialiaze())
 # print(WallObject().serialiaze())
-#print(deserialiaze('P')().serialiaze())
+# print(deserialiaze(' ')().serialiaze())
 # def     
 # huy(Grass)
 # huy(Wall)

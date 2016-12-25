@@ -13,6 +13,9 @@ class CharacteristicsBuilder(Singleton):
     
     def start_speed(self):
         self.character.speed = 1
+        
+    def start_move_speed(self):
+        self.character.move_speed = 1
     
     def start_damage(self):
         self.character.damage = 10
@@ -30,6 +33,7 @@ class CharacteristicsBuilder(Singleton):
         self.start_speed()
         self.start_damage()
         self.start_strategy()
+        self.start_move_speed()
 #         self.start_magic()
         return self.character
     
@@ -41,8 +45,8 @@ class SoilderBuilder(CharacteristicsBuilder):
         self.character.armor = 50
     def start_damage(self):
         self.character.damage = 100
-    def start_speed(self):
-        self.character.speed = 2
+    def start_move_speed(self):
+        self.character.move_speed = 2
         
 # class HeavySoilderBuilder(CharacteristicsBuilder):
 #     def start_hp(self):

@@ -1,7 +1,8 @@
-from game.WorldObjects import deserialiaze, ObjectProfileEnum, GrassObject
+from game.WorldObjects import deserialiaze, ObjectProfileEnum, GrassObject,\
+    KnifeObject
 from game.field import Field
 from game.logic import simulate_fight, can_move
-from game.actions import MoveAction
+from game.actions import MoveAction, ThrowAction
 from enum import Enum
 class GameOver(Enum):
     NOT = 0
@@ -14,26 +15,29 @@ class World:
         self.objcts = []
         self.surroundings = []
         self.player = None
+        self.player_active_items = []
         self.player_moves_q = []
         self.game_over = GameOver.NOT
         
         self.rows, self.cols = field.get_demensions()
         for x in range(self.rows):
             for y in range(self.cols):
-                self.add_cls(GrassObject, (x,y))
+                self.add_obj(GrassObject(), (x,y))
                 cls = deserialiaze(field.get_at(x, y))
-                self.add_cls(cls, (x,y))
-                
-    def add_cls(self, cls, location):
-        obj = cls()
+                self.add_obj(cls(), (x,y))
+             
+    def add_obj(self, obj, location):
         self.set_location(obj, location)
         self.last_move[obj] = 0.0
-        if cls.PROFILE == ObjectProfileEnum.PLAYER:
+        if obj.PROFILE == ObjectProfileEnum.PLAYER:
             self.player = obj
-        if cls.PROFILE == ObjectProfileEnum.CHARACTER:
+        if obj.PROFILE == ObjectProfileEnum.CHARACTER:
             self.objcts.append(obj)
-        if cls.PROFILE == ObjectProfileEnum.SURROUNDING:
+        if obj.PROFILE == ObjectProfileEnum.SURROUNDING:
             self.surroundings.append(obj)
+        if obj.PROFILE == ObjectProfileEnum.ITEM:
+            if obj.owner == self.player:
+                self.player_active_items.append(obj)
         
     def set_location(self, obj, new_location):
         self.locations[obj]= new_location
@@ -70,6 +74,8 @@ class World:
                 next_actions.append(obj.make_action(obj, self))
                 new_delta = 0
             self.last_move[obj]= new_delta
+        for item in self.player_active_items:
+            next_actions.append(item.make_action(item, self))
         if len(self.player_moves_q) > 0:
             next_actions.append(self.player_moves_q.pop())
         return next_actions
@@ -86,13 +92,18 @@ class World:
         dump_list(self.surroundings)
         dump_list(self.objcts)
         dump_list([self.player])
+        dump_list(self.player_active_items)
         return field
     
+    def knifes_count(self):
+        return len(self.player_active_items)
     def player_status(self):
         st = {}
         st["hp"] = str(self.player.hp)
         st["armor"] = str(self.player.armor)
         st["speed"] = str(self.player.speed)
+        st["move_speed"] = str(self.player.move_speed)
+        st["knifes"] = str(self.knifes_count())
         st["damage"] = str(self.player.damage)
         return st
     
@@ -109,13 +120,24 @@ class World:
         return self.game_over == GameOver.WIN
     
     def destroy_obj(self, obj):
-        self.objcts.remove(obj)
+        if obj in self.objcts:
+            self.objcts.remove(obj)
+        if obj in self.player_active_items:
+            self.player_active_items.remove(obj)
         del self.locations[obj]
+        
+    def player_throwed_knife(self, vec):
+        if self.knifes_count() > 0:
+            self.player_moves_q.append(ThrowAction(self.player, KnifeObject(vec), self))
+        
+    def throw_weapon(self, w_obj, location):
+        self.add_obj(w_obj, location)
     
     def impact(self, actions):
         for action in actions:
             action.impact(self)
         destroyed = []
+        active_items = self.player_active_items
         for obj in self.objcts:
             if self.location(obj) == self.player_location():
                 winner = simulate_fight(self.player, obj)
@@ -124,10 +146,20 @@ class World:
                     return
                 self.player = winner
                 destroyed.append(obj)
-                
+            else:    
+                for item in active_items:
+                    if self.location(obj) == self.location(item):
+                        winner = simulate_fight(item, obj)
+                        if winner == item:
+                            destroyed.append(obj)
+                            break
+                        else:
+                            destroyed.append(item)
+                        
+                    
+            
         for obj in destroyed:
             self.destroy_obj(obj)
-                
         
                 
 #     def new_weapon(self, weapon, center, vec):
