@@ -11,7 +11,6 @@ class Field:
             for line in f:
                 chars = list(str.rstrip(line))
                 self._field.append(chars)
-                print(chars)
                 
     def set_at(self, x, y, c):
         self._field[x][y] = c

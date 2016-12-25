@@ -7,7 +7,7 @@ from game.World import World
 class Manager:
     LOGIC_TICK = 0.2
     def register_keys(self):
-        self.gfx.register_key_event('Q', self.gfx.finit)
+        self.gfx.register_key_event('q', self.gfx.finit)
         
     def register_events(self):
         self.gfx.set_on_finit(self.on_finit)
@@ -25,23 +25,26 @@ class Manager:
         self.world = World(self.start_field)
         while not self.finit:
             self.next_world()
-            self.gfx.push_frame(Frame(self.world.frame(), {}))
+#             print(self.world.field()._field[0])
+            self.gfx.push_frame(Frame(self.world.field(), {}))
             sleep(self.LOGIC_TICK)
                 
             
     def __init__(self, field, gfx):
         self.finit = False
-        self.gfx = gfx
         self.start_field = field
+        self.gfx = gfx
         self.register_keys()
         self.register_events()
+        self.logic_t = threading.Thread(target=self.logic_thread)
         
     def on_finit(self):
         self.finit = True
         
     def start(self):
-        self.logic_t = threading.Thread(target=self.logic_thread)
+        self.logic_t.start()
         self.gfx.start_loops()
         self.gfx.join_loops()
+        self.logic_t.join()
     
 

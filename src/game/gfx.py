@@ -18,7 +18,7 @@ class FieldRenderer(ScreenRenderer):
         scr.clear()
         for i in range(rows):
             for j in range(cols):
-                scr.addch(j, i, field.get_at(i, j))
+                scr.addch(i, j, field.get_at(i, j))
         scr.refresh()
         
 class StatusRenderer(ScreenRenderer):
@@ -115,7 +115,6 @@ class GfxDefault(Gfx):
         h, _ = sc.getmaxyx()
         fieldr.set_scr(sc.derwin(0, 0))
         parts = (self.FIELD_PROPORTION + self.STATUS_PROPORTION + self.IO_PROPORTION) 
-        print(int(1.0 /self.FIELD_PROPORTION * parts))
         statusr.set_scr(sc.derwin(int(1.0 * self.FIELD_PROPORTION / parts * h) , 0))
         self.set_scr(sc.derwin(int(1.0 * (self.FIELD_PROPORTION + self.STATUS_PROPORTION) / parts * h), 0))
         self.set_renderers(fieldr, statusr)

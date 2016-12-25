@@ -56,7 +56,7 @@ def deserialiaze(chr):
 # print(object_entities)
 # print(GrassObject().serialiaze())
 # print(WallObject().serialiaze())
-# print(deserialiaze('*').serialiaze())
+# print(deserialiaze('P')(game.characters.SoilderBuilder).serialiaze())
 # def     
 # huy(Grass)
 # huy(Wall)

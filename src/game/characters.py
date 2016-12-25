@@ -25,7 +25,6 @@ class CharacteristicsBuilder(Singleton):
     
     def build(self, entity):
         self.start_build(entity)
-        self.build_internal()
         self.start_hp()
         self.start_armor()
         self.start_speed()
