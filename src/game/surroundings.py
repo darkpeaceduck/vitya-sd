@@ -1,5 +1,6 @@
 from game.util import Singleton
 
+#builder + singleton
 class SurroundingsBuilder(Singleton):
     def start_build(self, entity):
         self.entity = entity
