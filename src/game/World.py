@@ -1,7 +1,7 @@
 from game.WorldObjects import deserialiaze, ObjectProfileEnum, GrassObject,\
-    KnifeObject
+    KnifeActiveObject
 from game.field import Field
-from game.logic import simulate_fight, can_move
+from game.logic import simulate_fight, can_move, get_drop
 from game.actions import MoveAction, ThrowAction
 from enum import Enum
 class GameOver(Enum):
@@ -16,7 +16,9 @@ class World:
         self.surroundings = []
         self.player = None
         self.player_active_items = []
+        self.player_passive_items = []
         self.player_moves_q = []
+        self.drop = []
         self.game_over = GameOver.NOT
         
         self.rows, self.cols = field.get_demensions()
@@ -36,8 +38,10 @@ class World:
         if obj.PROFILE == ObjectProfileEnum.SURROUNDING:
             self.surroundings.append(obj)
         if obj.PROFILE == ObjectProfileEnum.ITEM:
-            if obj.owner == self.player:
+            if obj.owner == self.player and self.player != None:
                 self.player_active_items.append(obj)
+            else:
+                self.drop.append(obj)
         
     def set_location(self, obj, new_location):
         self.locations[obj]= new_location
@@ -91,12 +95,13 @@ class World:
                 field.set_at(x, y, item.serialiaze())
         dump_list(self.surroundings)
         dump_list(self.objcts)
-        dump_list([self.player])
         dump_list(self.player_active_items)
+        dump_list(self.drop)
+        dump_list([self.player])
         return field
     
     def knifes_count(self):
-        return len(self.player_active_items)
+        return len(self.player_passive_items)
     def player_status(self):
         st = {}
         st["hp"] = str(self.player.hp)
@@ -124,11 +129,13 @@ class World:
             self.objcts.remove(obj)
         if obj in self.player_active_items:
             self.player_active_items.remove(obj)
+        if obj in self.drop:
+            self.drop.remove(obj)
         del self.locations[obj]
         
     def player_throwed_knife(self, vec):
         if self.knifes_count() > 0:
-            self.player_moves_q.append(ThrowAction(self.player, KnifeObject(vec), self))
+            self.player_moves_q.append(ThrowAction(self.player, self.player_passive_items.pop()(vec), self))
         
     def throw_weapon(self, w_obj, location):
         self.add_obj(w_obj, location)
@@ -156,7 +163,12 @@ class World:
                         else:
                             destroyed.append(item)
                         
+        for item in self.drop:
+            if self.player_location() == self.location(item):
+                if not get_drop(self.player, item):
+                    self.player_passive_items.append(KnifeActiveObject)
                     
+                destroyed.append(item)
             
         for obj in destroyed:
             self.destroy_obj(obj)

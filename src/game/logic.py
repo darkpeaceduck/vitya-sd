@@ -22,5 +22,12 @@ def simulate_fight(player, enemy):
             if is_destroy(player):
                 return enemy
             
+def get_drop(player, item):
+    if item.active:
+        return False
+    player.armor += item.armor
+    player.damage += item.damage
+    return True
+            
 def can_move(obj, delta):
     return 2 * (1.0/obj.move_speed) < delta
