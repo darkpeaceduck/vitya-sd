@@ -1,9 +1,10 @@
 from game.WorldObjects import deserialiaze, ObjectProfileEnum, GrassObject
 from game.field import Field
-from game.logic import simulate_fight
+from game.logic import simulate_fight, can_move
 class World:
     def __init__(self, field):
         self.locations = {}
+        self.last_move = {}
         self.objcts = []
         self.surroundings = []
         self.player = None
@@ -12,19 +13,20 @@ class World:
         self.rows, self.cols = field.get_demensions()
         for x in range(self.rows):
             for y in range(self.cols):
+                self.add_cls(GrassObject, (x,y))
                 cls = deserialiaze(field.get_at(x, y))
-                obj = cls()
-                self.set_location(obj, (x, y))
-                grass_obj = GrassObject()
-                self.set_location(grass_obj, (x,y))
-                #low priority
-                self.surroundings.append(grass_obj)
-                if cls.PROFILE == ObjectProfileEnum.PLAYER:
-                    self.player = obj
-                if cls.PROFILE == ObjectProfileEnum.CHARACTER:
-                    self.objcts.append(obj)
-                if cls.PROFILE == ObjectProfileEnum.SURROUNDING:
-                    self.surroundings.append(obj)
+                self.add_cls(cls, (x,y))
+                
+    def add_cls(self, cls, location):
+        obj = cls()
+        self.set_location(obj, location)
+        self.last_move[obj] = 0.0
+        if cls.PROFILE == ObjectProfileEnum.PLAYER:
+            self.player = obj
+        if cls.PROFILE == ObjectProfileEnum.CHARACTER:
+            self.objcts.append(obj)
+        if cls.PROFILE == ObjectProfileEnum.SURROUNDING:
+            self.surroundings.append(obj)
         
     def set_location(self, obj, new_location):
         self.locations[obj]= new_location
@@ -44,7 +46,6 @@ class World:
         return False
     
     def new_location(self, obj, new_location):
-        print(new_location)
         if not self.out_of_bounds(new_location) and not self.obstruction_at(new_location):
             self.set_location(obj, new_location) 
         
@@ -53,6 +54,16 @@ class World:
     
     def player_location(self):
         return self.location(self.player)
+    
+    def produce_step_actions(self, delta):
+        next_actions = []
+        for obj in self.objects():
+            new_delta = delta + self.last_move[obj]
+            if can_move(obj, new_delta): 
+                next_actions.append(obj.make_action(obj, self))
+                new_delta = 0
+            self.last_move[obj]= new_delta
+        return next_actions
     
     def field(self):
         field = Field(self.rows, self.cols)
@@ -64,6 +75,14 @@ class World:
         dump_list(self.objcts)
         dump_list([self.player])
         return field
+    
+    def player_status(self):
+        st = {}
+        st["hp"] = str(self.player.hp)
+        st["armor"] = str(self.player.armor)
+        st["speed"] = str(self.player.speed)
+        st["damage"] = str(self.player.damage)
+        return st
     
     def set_game_over(self):
         self.game_over = True

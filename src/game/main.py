@@ -9,8 +9,8 @@ if __name__ == "__main__":
     
     field = Field()
     field.load_file(sys.argv[1])
-#     gfx = GfxDefault()
-    gfx = None
+    gfx = GfxDefault()
+#     gfx = None
     mng = Manager(field, gfx)
     mng.start()
     

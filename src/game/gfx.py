@@ -43,6 +43,7 @@ class FrameQRenderer:
         self.status_renderer.render_stat(frame.stat)
         
 class IOControllerRenderer(ScreenRenderer):
+    NON_BLOCKING_IO_DELAY_TIMEOUT = 0.01
     def __init__(self):
         self.finilizated = False
         self.key_ev_list = {}
@@ -57,10 +58,12 @@ class IOControllerRenderer(ScreenRenderer):
         self.on_finit = event
         
     def io_loop(self):
+        self.get_scr().nodelay(True)
         while not self.is_finilizated():
             event = self._stdscr.getch()
             if event in self.key_ev_list:
                 self.invoke_event(self.key_ev_list[event])
+            sleep(self.NON_BLOCKING_IO_DELAY_TIMEOUT)
         self.finit()
         
     def is_finilizated(self):
@@ -75,7 +78,7 @@ class IOControllerRenderer(ScreenRenderer):
         
                 
 class Gfx(FrameQRenderer, IOControllerRenderer):
-    RENDER_TICK = 0.01
+    RENDER_TICK = 0.001
     def __init__(self):
         FrameQRenderer.__init__(self)
         IOControllerRenderer.__init__(self)
@@ -89,8 +92,6 @@ class Gfx(FrameQRenderer, IOControllerRenderer):
             self.update_input_derwin()
             sleep(self.RENDER_TICK)
             
-        curses.endwin()
-            
         
     def start_loops(self):
         self.render_t = threading.Thread(target=self.render_loop)
@@ -101,6 +102,7 @@ class Gfx(FrameQRenderer, IOControllerRenderer):
     def join_loops(self):
         self.render_t.join()
         self.io_t.join()
+        curses.endwin()    
         
 class GfxDefault(Gfx):
     FIELD_PROPORTION = 5
