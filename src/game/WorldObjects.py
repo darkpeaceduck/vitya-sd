@@ -24,6 +24,7 @@ class ObjectProfileEnum(Enum):
     PLAYER = 2
     CHARACTER = 3
     ITEM = 4
+    END_KEY = 5
     
 @world_obj
 class GrassObject(Grass):
@@ -66,6 +67,11 @@ class ShieldDrop(Shield):
 class SwordDrop(Sword):
     TAG = 'S'
     PROFILE = ObjectProfileEnum.ITEM
+    
+@world_obj
+class ExitKey(object):
+    TAG='$'
+    PROFILE = ObjectProfileEnum.END_KEY
     
 def deserialiaze(chr):
     return object_entities[chr]

@@ -19,6 +19,7 @@ class World:
         self.player_passive_items = []
         self.player_moves_q = []
         self.drop = []
+        self.keys = []
         self.game_over = GameOver.NOT
         
         self.rows, self.cols = field.get_demensions()
@@ -42,6 +43,8 @@ class World:
                 self.player_active_items.append(obj)
             else:
                 self.drop.append(obj)
+        if obj.PROFILE == ObjectProfileEnum.END_KEY:
+            self.keys.append(obj)
         
     def set_location(self, obj, new_location):
         self.locations[obj]= new_location
@@ -97,6 +100,7 @@ class World:
         dump_list(self.objcts)
         dump_list(self.player_active_items)
         dump_list(self.drop)
+        dump_list(self.keys)
         dump_list([self.player])
         return field
     
@@ -131,6 +135,8 @@ class World:
             self.player_active_items.remove(obj)
         if obj in self.drop:
             self.drop.remove(obj)
+        if obj in self.keys:
+            self.keys.remove(obj)
         del self.locations[obj]
         
     def player_throwed_knife(self, vec):
@@ -169,9 +175,16 @@ class World:
                     self.player_passive_items.append(KnifeActiveObject)
                     
                 destroyed.append(item)
+                
+        for key in self.keys:
+            if self.player_location() == self.location(key):
+                destroyed.append(key)
             
         for obj in destroyed:
             self.destroy_obj(obj)
+            
+        if len(self.keys) == 0:
+            self.set_game_over(GameOver.WIN)
         
                 
 #     def new_weapon(self, weapon, center, vec):
