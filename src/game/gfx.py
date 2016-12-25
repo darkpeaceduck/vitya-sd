@@ -43,7 +43,7 @@ class FrameQRenderer:
         self.status_renderer.render_stat(frame.stat)
         
 class IOControllerRenderer(ScreenRenderer):
-    NON_BLOCKING_IO_DELAY_TIMEOUT = 0.01
+    NON_BLOCKING_IO_DELAY_TIMEOUT = 0.001
     def __init__(self):
         self.finilizated = False
         self.key_ev_list = {}

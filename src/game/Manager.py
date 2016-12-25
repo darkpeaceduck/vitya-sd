@@ -6,7 +6,7 @@ from game.World import World
 from game.actions import RIGHT, DOWN, UP, LEFT
 
 class Manager:
-    LOGIC_TICK = 0.2
+    LOGIC_TICK = 0.01
     def register_keys(self):
         self.gfx.register_key_event('q', self.game_over)
         self.gfx.register_key_event('d', self.player_moved_right)

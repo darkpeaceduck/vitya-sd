@@ -102,11 +102,11 @@ class World:
                 x, y = self.location(item)
                 field.set_at(x, y, item.serialiaze())
         dump_list(self.surroundings)
-        dump_list(self.objcts)
-        dump_list(self.enemy_active_items)
-        dump_list(self.player_active_items)
         dump_list(self.drop)
         dump_list(self.keys)
+        dump_list(self.player_active_items)
+        dump_list(self.enemy_active_items)
+        dump_list(self.objcts)
         dump_list([self.player])
         return field
     
@@ -170,7 +170,7 @@ class World:
             else:    
                 for item in active_items:
                     if self.location(obj) == self.location(item):
-                        winner = simulate_fight(item, obj)
+                        winner = simulate_fight(obj, item)
                         if winner == item:
                             destroyed.append(obj)
                             break
