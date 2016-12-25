@@ -1,6 +1,12 @@
 from game.WorldObjects import deserialiaze, ObjectProfileEnum, GrassObject
 from game.field import Field
 from game.logic import simulate_fight, can_move
+from game.actions import MoveAction
+from enum import Enum
+class GameOver(Enum):
+    NOT = 0
+    WIN = 1
+    LOSE = 2
 class World:
     def __init__(self, field):
         self.locations = {}
@@ -8,7 +14,8 @@ class World:
         self.objcts = []
         self.surroundings = []
         self.player = None
-        self.game_over = False
+        self.player_moves_q = []
+        self.game_over = GameOver.NOT
         
         self.rows, self.cols = field.get_demensions()
         for x in range(self.rows):
@@ -63,7 +70,12 @@ class World:
                 next_actions.append(obj.make_action(obj, self))
                 new_delta = 0
             self.last_move[obj]= new_delta
+        if len(self.player_moves_q) > 0:
+            next_actions.append(self.player_moves_q.pop())
         return next_actions
+    
+    def player_moved(self, vec):
+        self.player_moves_q.append(MoveAction(self.player, self, vec))
     
     def field(self):
         field = Field(self.rows, self.cols)
@@ -84,11 +96,17 @@ class World:
         st["damage"] = str(self.player.damage)
         return st
     
-    def set_game_over(self):
-        self.game_over = True
+    def set_game_over(self, st):
+        self.game_over = st
         
     def is_game_over(self):
-        return self.game_over 
+        return self.game_over != GameOver.NOT
+    
+    def is_lose(self):
+        return self.game_over == GameOver.LOSE
+    
+    def is_win(self):
+        return self.game_over == GameOver.WIN
     
     def destroy_obj(self, obj):
         self.objcts.remove(obj)
@@ -102,7 +120,7 @@ class World:
             if self.location(obj) == self.player_location():
                 winner = simulate_fight(self.player, obj)
                 if winner != self.player:
-                    self.set_game_over()
+                    self.set_game_over(GameOver.LOSE)
                     return
                 self.player = winner
                 destroyed.append(obj)

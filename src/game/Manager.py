@@ -3,11 +3,28 @@ import threading
 import copy
 from time import sleep
 from game.World import World
+from game.actions import RIGHT, DOWN, UP, LEFT
 
 class Manager:
     LOGIC_TICK = 0.2
     def register_keys(self):
         self.gfx.register_key_event('q', self.game_over)
+        self.gfx.register_key_event('d', self.player_moved_right)
+        self.gfx.register_key_event('a', self.player_moved_left)
+        self.gfx.register_key_event('w', self.player_moved_up)
+        self.gfx.register_key_event('s', self.player_moved_down)
+        
+    def player_moved_right(self):
+        self.world.player_moved(DOWN)
+        
+    def player_moved_left(self):
+        self.world.player_moved(UP)
+        
+    def player_moved_up(self):
+        self.world.player_moved(LEFT)
+        
+    def player_moved_down(self):
+        self.world.player_moved(RIGHT)
         
     def register_events(self):
         self.gfx.set_on_finit(self.on_finit)
@@ -29,6 +46,7 @@ class Manager:
             self.gfx.push_frame(Frame(self.world.field(), self.world.player_status()))
             if self.world.is_game_over():
                 self.game_over()
+                break
             sleep(self.LOGIC_TICK)
                 
             
@@ -47,10 +65,18 @@ class Manager:
         self.finit = True
         self.gfx.finit()
         
+    def print_end_replica(self):
+        if self.world.is_game_over():
+            if self.world.is_lose():
+                print("player losed")
+            else:
+                print("player won")
+        
     def start(self):
         self.logic_t.start()
         self.gfx.start_loops()
         self.gfx.join_loops()
         self.logic_t.join()
+        self.print_end_replica()
     
 
