@@ -6,7 +6,10 @@ from chat.ConnectionManagers import AbstractConnectionManager
 '''
 Interracts with ConnectionManager - pushs message down,
 receives message inside declarated callbacks.
-Splits this functional from view. 
+Splits this functional from view.
+Upper layer may poll bus with get_msg or push msg to the bus.
+If you don't need to use poll functional instead of callback, don't 
+use bus  
 '''
 class AbstractBus(MessageQueueProcessor, AbstractConnectionManager):
     def __init__(self):
