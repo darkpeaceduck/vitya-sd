@@ -4,6 +4,11 @@ import tkinter as tk
 from tkinter.scrolledtext import ScrolledText
 from queue import Empty
 
+'''
+If you want to split interracting functional with connection managers into
+bus, just override render_loop method and use composition.
+Otherwise, inhirite AbstractBus  too.
+'''
 class AbstractView:
     @abstractmethod
     def render_loop(self):

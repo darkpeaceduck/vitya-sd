@@ -7,6 +7,11 @@ from queue import Queue, Empty
 import chat.Message as Message
 from chat.Message import MessageQueueProcessor
 
+'''
+serves connections and send messages to upper layer. 
+If you want implement your own, override methods marked with
+@abstractmethod
+'''
 class AbstractConnectionManager:
     def __init__(self):
         self.listeners = []

@@ -3,6 +3,11 @@ from threading import Event
 from abc import abstractmethod
 from chat.ConnectionManagers import AbstractConnectionManager
 
+'''
+Interracts with ConnectionManager - pushs message down,
+receives message inside declarated callbacks.
+Splits this functional from view. 
+'''
 class AbstractBus(MessageQueueProcessor, AbstractConnectionManager):
     def __init__(self):
         MessageQueueProcessor.__init__(self)
